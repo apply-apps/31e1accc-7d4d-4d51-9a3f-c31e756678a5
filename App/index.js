@@ -5,40 +5,38 @@ import React, { useRef, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TextInput, Button, View, ActivityIndicator } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import axios from 'axios';
 
 const Stack = createStackNavigator();
 
-export default function App() {
-    return (
-        <NavigationContainer>
-            <SafeAreaView style={styles.container}>
-                <Stack.Navigator initialRouteName="Login">
-                    <Stack.Screen name="Login" component={LoginScreen} />
-                    <Stack.Screen name="Signup" component={SignupScreen} />
-                </Stack.Navigator>
-            </SafeAreaView>
-        </NavigationContainer>
-    );
-}
-
-function LoginScreen() {
+const LoginScreen = () => {
     const emailRef = useRef('');
     const passwordRef = useRef('');
     const [loading, setLoading] = useState(false);
 
     const navigation = useNavigation();
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         setLoading(true);
-        // Simulate a network request
-        setTimeout(() => {
+        try {
+            const response = await axios.post('http://apihub.p.appply.xyz:3300/chatgpt', {
+                messages: [
+                    { role: "system", content: "You are a helpful assistant. Please provide answers for given requests." },
+                    { role: "user", content: `Login attempt with Email: ${emailRef.current}, Password: ${passwordRef.current}` }
+                ],
+                model: "gpt-4o"
+            });
+            const resultString = response.data.response;
             setLoading(false);
-            alert(`Login Successful:\nEmail: ${emailRef.current}\nPassword: ${passwordRef.current}`);
-        }, 2000);
+            alert(`Login Successful:\nResponse: ${resultString}`);
+        } catch (error) {
+            setLoading(false);
+            alert('Login Failed');
+        }
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.loginContainer}>
             <Text style={styles.title}>Login</Text>
             <TextInput
                 style={styles.input}
@@ -61,9 +59,9 @@ function LoginScreen() {
             <Button title="Signup" onPress={() => navigation.navigate('Signup')} />
         </SafeAreaView>
     );
-}
+};
 
-function SignupScreen() {
+const SignupScreen = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -71,18 +69,28 @@ function SignupScreen() {
 
     const navigation = useNavigation();
 
-    const handleSignup = () => {
+    const handleSignup = async () => {
         setLoading(true);
-        // Simulate a network request
-        setTimeout(() => {
+        try {
+            const response = await axios.post('http://apihub.p.appply.xyz:3300/chatgpt', {
+                messages: [
+                    { role: "system", content: "You are a helpful assistant. Please provide answers for given requests." },
+                    { role: "user", content: `Signup attempt with Username: ${username}, Email: ${email}, Password: ${password}` }
+                ],
+                model: "gpt-4o"
+            });
+            const resultString = response.data.response;
             setLoading(false);
-            alert('Signup Successful');
+            alert(`Signup Successful:\nResponse: ${resultString}`);
             navigation.navigate('Login');
-        }, 2000);
+        } catch (error) {
+            setLoading(false);
+            alert('Signup Failed');
+        }
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.signupContainer}>
             <Text style={styles.title}>Signup</Text>
             <TextInput
                 style={styles.input}
@@ -112,10 +120,32 @@ function SignupScreen() {
             )}
         </SafeAreaView>
     );
+};
+
+export default function App() {
+    return (
+        <NavigationContainer>
+            <SafeAreaView style={styles.container}>
+                <Stack.Navigator initialRouteName="Login">
+                    <Stack.Screen name="Login" component={LoginScreen} />
+                    <Stack.Screen name="Signup" component={SignupScreen} />
+                </Stack.Navigator>
+            </SafeAreaView>
+        </NavigationContainer>
+    );
 }
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
+        marginTop: 20,
+    },
+    loginContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        padding: 20,
+    },
+    signupContainer: {
         flex: 1,
         justifyContent: 'center',
         padding: 20,
