@@ -1,16 +1,29 @@
 // Filename: index.js
 // Combined code from all files
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TextInput, Button, View, ActivityIndicator } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
 
+export default function App() {
+    return (
+        <NavigationContainer>
+            <SafeAreaView style={styles.container}>
+                <Stack.Navigator initialRouteName="Login">
+                    <Stack.Screen name="Login" component={LoginScreen} />
+                    <Stack.Screen name="Signup" component={SignupScreen} />
+                </Stack.Navigator>
+            </SafeAreaView>
+        </NavigationContainer>
+    );
+}
+
 function LoginScreen() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const emailRef = useRef('');
+    const passwordRef = useRef('');
     const [loading, setLoading] = useState(false);
 
     const navigation = useNavigation();
@@ -20,7 +33,7 @@ function LoginScreen() {
         // Simulate a network request
         setTimeout(() => {
             setLoading(false);
-            alert('Login Successful');
+            alert(`Login Successful:\nEmail: ${emailRef.current}\nPassword: ${passwordRef.current}`);
         }, 2000);
     };
 
@@ -30,16 +43,14 @@ function LoginScreen() {
             <TextInput
                 style={styles.input}
                 placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
+                onChangeText={(text) => emailRef.current = text}
                 keyboardType="email-address"
                 autoCapitalize="none"
             />
             <TextInput
                 style={styles.input}
                 placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
+                onChangeText={(text) => passwordRef.current = text}
                 secureTextEntry
             />
             {loading ? (
@@ -100,19 +111,6 @@ function SignupScreen() {
                 <Button title="Signup" onPress={handleSignup} />
             )}
         </SafeAreaView>
-    );
-}
-
-export default function App() {
-    return (
-        <NavigationContainer>
-            <SafeAreaView style={styles.container}>
-                <Stack.Navigator initialRouteName="Login">
-                    <Stack.Screen name="Login" component={LoginScreen} />
-                    <Stack.Screen name="Signup" component={SignupScreen} />
-                </Stack.Navigator>
-            </SafeAreaView>
-        </NavigationContainer>
     );
 }
 
