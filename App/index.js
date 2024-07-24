@@ -1,53 +1,138 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+// Filename: index.js
+// Combined code from all files
 
-const App = () => {
-  const fullText = 'Hi, this is Apply.\nCreating mobile apps is now as simple as typing text.\nJust input your idea and press APPLY, and our platform does the rest...';
-  const [displayedText, setDisplayedText] = useState('');
-  const [index, setIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+import React, { useState } from 'react';
+import { SafeAreaView, StyleSheet, Text, TextInput, Button, View, ActivityIndicator } from 'react-native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
-  useEffect(() => {
-    if (isPaused) return;
+const Stack = createStackNavigator();
 
-    const interval = setInterval(() => {
-      setDisplayedText((prev) => prev + fullText[index]);
-      setIndex((prev) => {
-        if (prev === fullText.length - 1) {
-          setIsPaused(true);
-          setTimeout(() => {
-            setDisplayedText('');
-            setIndex(0);
-            setIsPaused(false);
-          }, 2000);
-          return 0;
-        }
-        return prev + 1;
-      });
-    }, 100);
+function LoginScreen() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    return () => clearInterval(interval);
-  }, [index, isPaused]);
+    const navigation = useNavigation();
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.text}>{displayedText}</Text>
-    </View>
-  );
-};
+    const handleLogin = () => {
+        setLoading(true);
+        // Simulate a network request
+        setTimeout(() => {
+            setLoading(false);
+            alert('Login Successful');
+        }, 2000);
+    };
+
+    return (
+        <SafeAreaView style={styles.container}>
+            <Text style={styles.title}>Login</Text>
+            <TextInput
+                style={styles.input}
+                placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+            />
+            {loading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+                <Button title="Login" onPress={handleLogin} />
+            )}
+            <Button title="Signup" onPress={() => navigation.navigate('Signup')} />
+        </SafeAreaView>
+    );
+}
+
+function SignupScreen() {
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const navigation = useNavigation();
+
+    const handleSignup = () => {
+        setLoading(true);
+        // Simulate a network request
+        setTimeout(() => {
+            setLoading(false);
+            alert('Signup Successful');
+            navigation.navigate('Login');
+        }, 2000);
+    };
+
+    return (
+        <SafeAreaView style={styles.container}>
+            <Text style={styles.title}>Signup</Text>
+            <TextInput
+                style={styles.input}
+                placeholder="Username"
+                value={username}
+                onChangeText={setUsername}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+            />
+            {loading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+                <Button title="Signup" onPress={handleSignup} />
+            )}
+        </SafeAreaView>
+    );
+}
+
+export default function App() {
+    return (
+        <NavigationContainer>
+            <SafeAreaView style={styles.container}>
+                <Stack.Navigator initialRouteName="Login">
+                    <Stack.Screen name="Login" component={LoginScreen} />
+                    <Stack.Screen name="Signup" component={SignupScreen} />
+                </Stack.Navigator>
+            </SafeAreaView>
+        </NavigationContainer>
+    );
+}
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'black',
-    padding: 20,
-  },
-  text: {
-    color: 'white',
-    fontSize: 24,
-    fontFamily: 'monospace',
-  },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        padding: 20,
+    },
+    title: {
+        fontSize: 24,
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    input: {
+        height: 50,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 5,
+        marginBottom: 15,
+        paddingHorizontal: 10,
+    },
 });
-
-export default App;
